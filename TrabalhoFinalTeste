@@ -1,0 +1,89 @@
+import numpy as np 
+import pandas as pd 
+
+
+train_data = pd.read_csv("C:/Users/Marcio/Downloads/SAN FRANCISCO/train.csv")  
+print(train_data.head())
+pd.set_option('display.max_columns', None)
+
+print(train_data.shape)
+
+target = train_data["Category"].unique()
+
+print(target)
+
+test_data = pd.read_csv("C:/Users/Marcio/Downloads/SAN FRANCISCO/test.csv")
+print(test_data.head())
+
+print(test_data.shape)
+
+print(train_data.shape)
+
+data_dict = {}
+count = 1
+for data in target:
+    data_dict[data] = count
+    count = count + 1
+train_data["Category"] = train_data["Category"].replace(data_dict)
+
+print(train_data)
+
+data_week_dict= {
+    "Monday": 1,
+    "Tuesday":2,
+    "Wednesday":3,
+    "Thursday":4,
+    "Friday":5,
+    "Saturday":6,
+    "Sunday":7
+}
+train_data["DayOfWeek"] = train_data["DayOfWeek"].replace(data_week_dict)
+test_data["DayOfWeek"] = test_data["DayOfWeek"].replace(data_week_dict)
+
+district = train_data["PdDistrict"].unique()
+data_dict_district = {}
+count = 1
+for data in district:
+    data_dict_district[data] = count
+    count+=1
+train_data["PdDistrict"] = train_data["PdDistrict"].replace(data_dict_district)
+test_data["PdDistrict"] = test_data["PdDistrict"].replace(data_dict_district)
+
+print(train_data.head())
+
+columns_train = train_data.columns 
+print(columns_train) 
+
+columns_test = test_data.columns
+print(columns_test)
+
+cols = columns_train.drop("Resolution")
+print(cols)
+
+train_data_new = train_data[cols]
+print(train_data_new.head())
+
+print(train_data_new.describe())
+
+corr = train_data_new.corr()
+print(corr["Category"])
+
+skew = train_data_new.skew()
+print(skew)
+
+features = ["DayOfWeek", "PdDistrict", "X", "Y"]
+X = train_data[features]
+y = train_data["Category"]
+Z = test_data[features]
+
+from sklearn.model_selection import train_test_split
+X_treino,X_teste,y_treino,y_teste = train_test_split(X,y,test_size = 0.25,random_state = 0)
+
+from sklearn.neural_network import MLPClassifier
+clf = MLPClassifier(solver='sgd', alpha=1.0, hidden_layer_sizes=(5, 2), random_state=1)
+clf.fit(X_treino, y_treino)
+
+y_predito_mlp = clf.predict(X_teste)
+
+from sklearn.metrics import accuracy_score
+accuracy_score(y_teste,y_predito_mlp)
