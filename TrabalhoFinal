@@ -86,4 +86,4 @@ clf.fit(X_treino, y_treino)
 y_predito_mlp = clf.predict(X_teste)
 
 from sklearn.metrics import accuracy_score
-accuracy_score(y_teste,y_predito_mlp)
+accuracy_score(y_teste,y_predito_mlp) 
